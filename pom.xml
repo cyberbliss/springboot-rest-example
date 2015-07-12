@@ -1,0 +1,169 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>uk.co.cyberbliss</groupId>
+  <artifactId>books-example</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>sj-springBootRest</name>
+  <url>http://maven.apache.org</url>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.2.4.RELEASE</version>
+    </parent>
+
+  <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <start-class>uk.co.cyberbliss.App</start-class>
+
+        <!-- Required for Spring rest docs -->
+        <snippetsDirectory>${project.build.directory}/generated-snippets</snippetsDirectory>
+
+  </properties>
+
+  <dependencies>
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-web</artifactId>
+      </dependency>
+      <!-- tag::actuator[] -->
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-actuator</artifactId>
+      </dependency>
+      <!-- end::actuator[] -->
+      <dependency>
+          <groupId>org.springframework.hateoas</groupId>
+          <artifactId>spring-hateoas</artifactId>
+      </dependency>
+
+      <!-- testing dependencies -->
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-test</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>com.jayway.jsonpath</groupId>
+          <artifactId>json-path</artifactId>
+          <version>2.0.0</version>
+      </dependency>
+
+      <!-- Swagger tooling dependency -->
+      <dependency>
+          <groupId>io.springfox</groupId>
+          <artifactId>springfox-swagger2</artifactId>
+          <version>2.0.2</version>
+      </dependency>
+
+      <!-- Required for SpringRestDoc -->
+      <dependency>
+          <groupId>nl.tritales.springrestdoc</groupId>
+          <artifactId>springrestdoc</artifactId>
+          <version>0.1.0</version>
+          <scope>test</scope>
+      </dependency>
+
+      <!-- Required for Spring-restdocs -->
+      <dependency>
+          <groupId>org.springframework.restdocs</groupId>
+          <artifactId>spring-restdocs</artifactId>
+          <version>1.0.0.M1</version>
+          <scope>test</scope>
+      </dependency>
+
+  </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <!-- Plugin to generate API documentation using ApiDocJS -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>apidoc</executable>
+                    <arguments>
+                        <argument>-i</argument>
+                        <argument>${project.basedir}/src/main/java/</argument>
+                        <argument>-o</argument>
+                        <argument>${project.build.directory}/apidocs/</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*Documentation.java</include>
+                    </includes>
+                    <systemPropertyVariables>
+                        <org.springframework.restdocs.outputDir>
+                            ${snippetsDirectory}
+                        </org.springframework.restdocs.outputDir>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctor-maven-plugin</artifactId>
+                <version>1.5.2</version>
+                <executions>
+                    <execution>
+                        <id>generate-docs</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>process-asciidoc</goal>
+                        </goals>
+
+                    </execution>
+                </executions>
+                <configuration>
+                    <backend>html</backend>
+                    <doctype>book</doctype>
+                    <sourceDirectory>${project.build.directory}/generated-ascii-doc</sourceDirectory>
+                    <outputDirectory>${project.build.directory}/generated-html-docs</outputDirectory>
+                    <attributes>
+                        <snippets>${snippetsDirectory}</snippets>
+                    </attributes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.2.11</version>
+                <configuration>
+                    <imageName>books-example</imageName>
+                    <baseImage>java:8</baseImage>
+                    <entryPoint>["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
+                    <exposes>
+                        <expose>9080</expose>
+                    </exposes>
+                    <!-- copy the service's jar file from target into the root directory of the image -->
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

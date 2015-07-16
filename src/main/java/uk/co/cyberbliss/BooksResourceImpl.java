@@ -33,9 +33,9 @@ public class BooksResourceImpl implements BooksResource {
     @ResponseBody
     public ResponseEntity<Book> getBookByIsbn(@PathVariable String isbn) {
         Book result = booksRepo.getBook(isbn);
-        result.removeLinks();
         HttpStatus httpStatus;
         if(result != null) {
+            result.removeLinks();
             result.add(linkTo(methodOn(BooksResourceImpl.class).getBookByIsbn(isbn)).withSelfRel());
             httpStatus = HttpStatus.OK;
         }else{

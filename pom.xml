@@ -21,7 +21,7 @@
         <start-class>uk.co.cyberbliss.App</start-class>
 
         <!-- Required for Spring rest docs -->
-        <snippetsDirectory>${project.build.directory}/generated-snippets</snippetsDirectory>
+        <snippetsDirectory>${project.build.directory}/generated-ascii-doc</snippetsDirectory>
 
   </properties>
 
@@ -136,13 +136,16 @@
                 <configuration>
                     <backend>html</backend>
                     <doctype>book</doctype>
-                    <sourceDirectory>${project.build.directory}/generated-ascii-doc</sourceDirectory>
+                    <sourceDirectory>${basedir}/src/main/asciidoc</sourceDirectory>
                     <outputDirectory>${project.build.directory}/generated-html-docs</outputDirectory>
+                    <preserveDirectories>true</preserveDirectories>
                     <attributes>
                         <snippets>${snippetsDirectory}</snippets>
                     </attributes>
                 </configuration>
             </plugin>
+
+            <!-- Plugin to generate a Docker image for running this app -->
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>

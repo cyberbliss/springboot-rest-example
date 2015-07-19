@@ -1,6 +1,8 @@
 package uk.co.cyberbliss;
 
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("/api")
+@Api(value = "Book", description = "Operations about Books")
 public class BooksResourceImpl implements BooksResource {
 
     @Autowired
@@ -31,6 +34,7 @@ public class BooksResourceImpl implements BooksResource {
             produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @ApiOperation(value = "Get a book using its ISBN")
     public ResponseEntity<Book> getBookByIsbn(@PathVariable String isbn) {
         Book result = booksRepo.getBook(isbn);
         HttpStatus httpStatus;
@@ -51,6 +55,7 @@ public class BooksResourceImpl implements BooksResource {
     @RequestMapping(value = "/book",
             method = RequestMethod.POST,
             consumes = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Add a book")
     public ResponseEntity<Book> addBook(@RequestBody Book book) {
         booksRepo.addBook(book);
         book.add(linkTo(methodOn(BooksResourceImpl.class).getBookByIsbn(book.getIsbn())).withSelfRel());
@@ -64,6 +69,7 @@ public class BooksResourceImpl implements BooksResource {
             produces = APPLICATION_JSON_VALUE)
     @ResponseBody
     @Override
+    @ApiOperation(value = "List all books")
     public ResponseEntity<List<Book>> getAllBooks() {
         List<Book> books = booksRepo.getAllBooks();
         books.forEach(book -> {
@@ -77,6 +83,7 @@ public class BooksResourceImpl implements BooksResource {
     @RequestMapping(value = "/book/{isbn}",
             method = RequestMethod.PUT,
             consumes = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Update a book")
     public ResponseEntity<Book> updateBook(@PathVariable String isbn, @RequestBody Book book) {
         HttpStatus httpStatus;
         if(booksRepo.isBookAvailable(isbn)){
@@ -95,6 +102,7 @@ public class BooksResourceImpl implements BooksResource {
     @Override
     @RequestMapping(value = "/book/{isbn}",
             method = RequestMethod.DELETE)
+    @ApiOperation(value = "Delete a book")
     public ResponseEntity<Void> deleteBook(@PathVariable String isbn) {
         HttpStatus httpStatus;
         if(booksRepo.removeBook(isbn)){

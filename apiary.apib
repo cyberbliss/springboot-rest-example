@@ -43,10 +43,9 @@ Add a book
 + Request (application/json)
 
         {
-            { "isbn": "111-3",
-        "title": "A test book title",
-        "author": "Some author"
-    
+            "isbn": "111-3",
+            "title": "A test book title",
+            "author": "Some author"
         }
 
 + Response 201 (application/json)
@@ -59,7 +58,8 @@ Add a book
                 "author": "Some author",
                 "_links": {
                     "self": {
-                    "href": "http://localhost:9080/api/book/111-3"
+                        "href": "http://localhost:9080/api/book/111-3"
+                    }
                 },
                 "Books": {
                     "href": "http://localhost:9080/api/books"
@@ -83,8 +83,9 @@ Retrieve a Book using its ISBN
                 "title": "An Introduction to Programming in Go",
                 "author": "Caleb Doxsey",
                 "_links": {
-                "self": {
-                    "href": "http://localhost:9080/api/book/111-2"
+                    "self": {
+                        "href": "http://localhost:9080/api/book/111-2"
+                    }
                 }
             }
             
@@ -107,7 +108,8 @@ Update a Book's details
             "_links": {
                 "self": {
                     "href": "http://localhost:9080/api/book/111-3"
-                },
+                }
+            },
             "Books": {
                 "href": "http://localhost:9080/api/books"
             }

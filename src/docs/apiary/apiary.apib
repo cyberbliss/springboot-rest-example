@@ -1,11 +1,14 @@
 FORMAT: 1A
 HOST: http://localhost:9080/api
 
-# Books API
+# Group Books API
 
 Books API for example Books application.
 
 ## Books Collection [/books]
+
++ Attributes (Book Base)
+    + isbn (string) - Book's ISBN
 
 ### List All Books [GET]
 Retrieve a list of all books in the system
@@ -35,6 +38,9 @@ Retrieve a list of all books in the system
         ]
 
 ## Add a Book [/book]
+
++ Attributes (Book Base)
+    + isbn (string) - Book's ISBN
 
 ### Add a New Book [POST]
 
@@ -70,6 +76,9 @@ Add a book
 
 + Parameters
     + isbn (string) - ISBN of the Book
+    
++ Attributes (Book Base)
+    + isbn (string) - Book's ISBN
     
 ### Get a Book [GET]
 Retrieve a Book using its ISBN
@@ -114,9 +123,9 @@ Update a Book's details
                 "href": "http://localhost:9080/api/books"
             }
         }
+        
+# Data Structures
 
-
-
-    
-
-
+## Book Base (object)
++ title (string) - Book title
++ author (string) - Book author

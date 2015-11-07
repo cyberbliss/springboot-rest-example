@@ -1,0 +1,147 @@
+#%RAML 0.8
+title: Books API for example Books application
+baseUri: http://localhost:9080
+version: v0.0.1
+documentation:
+  - title: Overview
+    content: The Book application provides worked examples for different API documentation tools.
+schemas:
+  - book: |
+        { "$schema": "http://json-schema.org/draft-03/schema",
+          "type": "object",
+          "description": "A single book",
+          "properties": {
+            "isbn": {"type":"string"},
+            "title": {"type":"string"},
+            "author":{"type":"string"}
+          }
+        }
+  - books: |
+        { "$schema": "http://json-schema.org/draft-03/schema",
+          "type": "array",
+          "description": "A collection of books",
+          "items":
+          {
+            "type": "object",
+            "properties": {
+              "isbn": {"type":"string"},
+              "title": {"type":"string"},
+              "author":{"type":"string"}
+            }
+          }
+        }
+/api/books:
+  get:
+    description: Retrieve a list of all books in the system
+    responses:
+      200:
+        body:
+          application/json:
+            schema: books
+            example: |
+              [
+                {
+                    "isbn": "111-1",
+                    "title": "Java 8 Lamdas",
+                    "author": "Richard Warburton",
+                    "_links": {
+                        "self": {
+                            "href": "http://localhost:9080/api/book/111-1"
+                        }
+                    }
+                },
+                {
+                    "isbn": "111-2",
+                    "title": "An Introduction to Programming in Go",
+                    "author": "Caleb Doxsey",
+                    "_links": {
+                        "self": {
+                            "href": "http://localhost:9080/api/book/111-2"
+                        }
+                    }
+                }
+              ]
+/api/book:
+    post:
+        description: Add a book
+        body:
+          application/json:
+            schema: book
+            example: |
+              {
+                "isbn": "111-31",
+                "title": "Test",
+                "author": "Steve"
+              }
+        responses:
+            201:
+                description: Book added
+                body:
+                    application/json:
+                      schema: book
+                      example: |
+                        {
+                          "isbn": "111-31",
+                          "title": "Test",
+                          "author": "Steve"
+                        }
+            400:
+              description:    Invalid input
+
+    /{isbn}:
+        description: ISBN identifier
+        uriParameters:
+          isbn:
+            type: string
+            example: 111-3
+        get:
+            description: Retrieve a book via its ISBN
+            responses:
+                200:
+                    body:
+                        application/json:
+                            schema: book
+                            example: |
+                                {
+                                    "isbn": "111-3",
+                                    "title": "Java 8 Lamdas",
+                                    "author": "Richard Warburton",
+                                    "_links": {
+                                        "self": {
+                                            "href": "http://localhost:9080/api/book/111-1"
+                                        }
+                                    }
+                                }
+                404:
+                    description: Book not found
+        put:
+          description: Update an existing Book using its ISBN as the key
+          body:
+            application/json:
+              schema: book
+              example: |
+                {
+                  "isbn": "111-1",
+                  "title": "New Test",
+                  "author": "Steve"
+                }
+          responses:
+            200:
+              body:
+                application/json:
+                  schema: book
+                  example: |
+                    {
+                      "title": "Test",
+                      "author": "Steve Austin"
+                    }
+            404:
+              description: Book to update not found
+        delete:
+          description: Delete a Book using its ISBN
+          responses:
+            200:
+              description: Book successfully deleted
+            404:
+              description: Book to delete not found
+

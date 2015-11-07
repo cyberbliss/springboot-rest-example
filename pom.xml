@@ -16,13 +16,20 @@
     </parent>
 
   <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
-        <start-class>uk.co.cyberbliss.App</start-class>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <java.version>1.8</java.version>
+      <start-class>uk.co.cyberbliss.App</start-class>
 
-        <!-- Required for Spring rest docs -->
-        <snippetsDirectory>${project.build.directory}/generated-ascii-doc</snippetsDirectory>
+      <!-- Required for Spring rest docs -->
+      <snippetsDirectory>${project.build.directory}/generated-ascii-doc</snippetsDirectory>
 
+      <!-- Required for Swagger2Markup & AsciiDoc plugins -->
+      <swagger.input.dir>${project.basedir}/src/docs/swagger</swagger.input.dir>
+      <base.generated.docs.dir>${project.build.directory}/generated-docs</base.generated.docs.dir>
+      <generated.asciidoc.dir>${base.generated.docs.dir}/asciidoc</generated.asciidoc.dir>
+      <asciidoc.input.dir>${project.basedir}/src/docs/asciidoc</asciidoc.input.dir>
+      <asciidoc.html.out.dir>${base.generated.docs.dir}/html</asciidoc.html.out.dir>
+      <asciidoc.pdf.out.dir>${base.generated.docs.dir}/pdf</asciidoc.pdf.out.dir>
   </properties>
 
   <dependencies>
@@ -51,20 +58,17 @@
           <artifactId>json-path</artifactId>
           <version>2.0.0</version>
       </dependency>
+      <dependency>
+          <groupId>io.github.robwin</groupId>
+          <artifactId>assertj-swagger</artifactId>
+          <version>0.1.2</version>
+      </dependency>
 
-      <!-- Swagger tooling dependency -->
+      <!-- Swagger tooling dependencies -->
       <dependency>
           <groupId>io.springfox</groupId>
           <artifactId>springfox-swagger2</artifactId>
           <version>2.0.2</version>
-      </dependency>
-
-      <!-- Required for SpringRestDoc -->
-      <dependency>
-          <groupId>nl.tritales.springrestdoc</groupId>
-          <artifactId>springrestdoc</artifactId>
-          <version>0.1.0</version>
-          <scope>test</scope>
       </dependency>
 
       <!-- Required for Spring-restdocs -->
@@ -77,33 +81,19 @@
 
   </dependencies>
     <build>
+        <resources>
+            <!-- Add the API spec files to the classpath (to help with testing) -->
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/docs</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-
-            <!-- Plugin to generate API documentation using ApiDocJS -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>site</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <executable>apidoc</executable>
-                    <arguments>
-                        <argument>-i</argument>
-                        <argument>${project.basedir}/src/main/java/</argument>
-                        <argument>-o</argument>
-                        <argument>${project.build.directory}/apidocs/</argument>
-                    </arguments>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -112,6 +102,13 @@
                     <includes>
                         <include>**/*Test.class</include>
                     </includes>
+                    <excludes>
+                        <!-- Excluding this class as the differences between
+                        the Swagger spec in src/docs/swagger and the SpringFox
+                        produced spec are too great to easily resolve
+                        -->
+                        <exclude>**/VerifySwaggerContractTest.class</exclude>
+                    </excludes>
                     <systemPropertyVariables>
                         <org.springframework.restdocs.outputDir>
                             ${snippetsDirectory}
@@ -119,6 +116,29 @@
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
+
+            <!-- Convert the Swagger spec into asciidoc format -->
+            <plugin>
+                <groupId>com.redowlanalytics</groupId>
+                <artifactId>swagger2markup-maven-plugin</artifactId>
+                <version>0.8.0</version>
+                <executions>
+                    <execution>
+                        <id>process-swagger</id>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>process-swagger</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <inputDirectory>${swagger.input.dir}</inputDirectory>
+                    <outputDirectory>${generated.asciidoc.dir}</outputDirectory>
+                    <examplesDirectory>${snippetsDirectory}</examplesDirectory>
+                    <markupLanguage>asciidoc</markupLanguage>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>
@@ -126,7 +146,7 @@
                 <executions>
                     <execution>
                         <id>generate-docs</id>
-                        <phase>package</phase>
+                        <phase>site</phase>
                         <goals>
                             <goal>process-asciidoc</goal>
                         </goals>
@@ -136,11 +156,11 @@
                 <configuration>
                     <backend>html</backend>
                     <doctype>book</doctype>
-                    <sourceDirectory>${basedir}/src/main/asciidoc</sourceDirectory>
-                    <outputDirectory>${project.build.directory}/generated-html-docs</outputDirectory>
+                    <sourceDirectory>${asciidoc.input.dir}</sourceDirectory>
+                    <outputDirectory>${asciidoc.html.out.dir}</outputDirectory>
                     <preserveDirectories>true</preserveDirectories>
                     <attributes>
-                        <snippets>${snippetsDirectory}</snippets>
+                        <snippets>${generated.asciidoc.dir}</snippets>
                     </attributes>
                 </configuration>
             </plugin>
@@ -165,6 +185,20 @@
                             <include>${project.build.finalName}.jar</include>
                         </resource>
                     </resources>
+                </configuration>
+            </plugin>
+
+            <!--
+            The Site phase is used for generating the API docs via Swagger but we don't want all the other Site stuff
+            generated so set all the default Site config to false
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.4</version>
+                <configuration>
+                    <generateReports>false</generateReports>
+                    <generateProjectInfo>false</generateProjectInfo>
                 </configuration>
             </plugin>
         </plugins>

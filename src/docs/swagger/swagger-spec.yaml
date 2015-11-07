@@ -1,0 +1,166 @@
+# Swagger yaml definition for example Books application
+swagger: '2.0'
+
+info:
+  description: |
+    The Book application provides worked examples for different API documentation tools.
+  
+  version: "0.0.1"
+  title: Example Book REST service
+
+host: localhost:9080
+#basePath: /api
+
+paths:
+  /api/books:
+    get:
+      tags:
+        - Book
+      summary: Get a list of Books
+      description: |
+        Gets all Books
+      produces:
+        - application/json
+
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Book"
+          examples:
+            application/json: |-
+              [
+                {
+                    "isbn": "111-1",
+                    "title": "Java 8 Lamdas",
+                    "author": "Richard Warburton",
+                    "_links": {
+                        "self": {
+                            "href": "http://localhost:9080/api/book/111-1"
+                        }
+                    }
+                },
+                {
+                    "isbn": "111-2",
+                    "title": "An Introduction to Programming in Go",
+                    "author": "Caleb Doxsey",
+                    "_links": {
+                        "self": {
+                            "href": "http://localhost:9080/api/book/111-2"
+                        }
+                    }
+                }
+              ]
+
+        400:
+          description: Invalid params supplied
+          
+  /api/book:
+    post:
+      tags:
+        - Book
+      summary: Add a new Book
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Book to add
+          required: true
+          schema:
+            $ref: "#/definitions/Book"
+      responses:
+        400:
+          description: Invalid input
+        201:
+          description: Book added
+          schema:
+            $ref: "#/definitions/Book"
+      
+  /api/book/{isbn}:
+    get:
+      tags:
+        - Book
+      summary: Get details for a Book
+      description: Retrieve a Book's details using its ISBN
+      produces:
+        - application/json
+      parameters:
+        - name: isbn
+          in: path
+          description: Book's ISBN
+          type: string
+          required: true
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/Book"
+        404:
+          description: Book not found
+
+    put:
+      tags:
+        - Book
+      summary: Update details for a Book
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: isbn
+          in: path
+          description: Book's ISBN
+          type: string
+          required: true
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Book"
+      responses:
+        200:
+          description: Update successful
+        404:
+          description: Book not found
+          
+    delete:
+      tags:
+        - Book
+      summary: Delete a Book
+      consumes:
+              - application/json
+      parameters:
+        - name: isbn
+          in: path
+          description: Book's ISBN
+          type: string
+          required: true
+      responses:
+        200:
+          description: Book deleted
+        404:
+          description: Book not found
+  
+definitions:
+  Book:
+    description: | 
+      Representation of a Book.
+    properties:
+      isbn:
+        type: string
+        description: the Book's ISBN
+      title:
+        type: string
+        description: the Book's title
+      author:
+        type: string
+        description: the Book's title
+        
+  

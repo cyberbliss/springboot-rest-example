@@ -53,7 +53,7 @@ public class SpringRestDocsAPIDocumentationTest {
         this.mockMvc.perform(get("/api/books").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(modifyResponseTo(ResponsePostProcessors.prettyPrintContent())
-                        .andDocument("getBooks").withResponseFields(
+                        .andDocument("get_a_list_of_books").withResponseFields(
                             fieldWithPath("[]isbn").description("The Book's ISBN"),
                             fieldWithPath("[]title").description("The Book's title"),
                             fieldWithPath("[]author").description("The Book's author"),
@@ -75,7 +75,7 @@ public class SpringRestDocsAPIDocumentationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title", equalTo(book.getTitle())))
                 .andDo(modifyResponseTo(ResponsePostProcessors.prettyPrintContent())
-                        .andDocument("getBook")
+                        .andDocument("get_details_for_a_book")
                         .withResponseFields(
                                 fieldWithPath("isbn").description("The Book's ISBN"),
                                 fieldWithPath("title").description("The Book's title"),
@@ -96,7 +96,7 @@ public class SpringRestDocsAPIDocumentationTest {
                 .content(convertObjectToJson(book)))
                 .andExpect(status().isCreated())
                 .andDo(modifyResponseTo(ResponsePostProcessors.prettyPrintContent())
-                        .andDocument("addBook")
+                        .andDocument("add_a_new_book")
                             .withRequestFields(
                                     fieldWithPath("isbn").description("The Book's ISBN"),
                                     fieldWithPath("title").description("The Book's title"),
@@ -136,7 +136,7 @@ public class SpringRestDocsAPIDocumentationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title", equalTo(book.getTitle())))
                 .andDo(modifyResponseTo(ResponsePostProcessors.prettyPrintContent())
-                        .andDocument("updateBook")
+                        .andDocument("update_details_for_a_book")
                                 .withRequestFields(
                                         fieldWithPath("isbn").description("Leave this field blank"),
                                         fieldWithPath("title").description("The Book's title"),
@@ -168,7 +168,7 @@ public class SpringRestDocsAPIDocumentationTest {
 
         mockMvc.perform(delete("/api/book/isbn-t4"))
                 .andExpect(status().isOk())
-                .andDo(document("deleteBook"));
+                .andDo(document("delete_a_book"));
 
         mockMvc.perform(get("/api/book/isbn-t4")
                 .accept(MediaType.APPLICATION_JSON))

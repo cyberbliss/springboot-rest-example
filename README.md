@@ -1,5 +1,5 @@
 # springboot-rest-example
-A complete Spring Boot example application for REST APIs; its purpose is to demonstrate various API documentation tools. To read the reviews of these tools visit this page: <https://www.opencredo.com/2015/07/28/rest-api-tooling-review/>
+A complete Spring Boot example application for REST APIs; its purpose is to demonstrate various API documentation tools.
 
 ## Installation
 * Ensure that Java 8 and Maven 3.2 are installed
@@ -17,3 +17,9 @@ Once started you can access the APIs on port 9080, e.g.
 
 The port number can be changed by editing the port property in `src/main/resources/application.yml`
 
+### Convert Swagger spec into HTML doc
+The swagger2markup and asciidoc maven plugins are used to publish the API documentation as an HTML doc. To use:
+
+`mvn clean test site`
+
+This will create the HTML doc in `target/generated-docs/html`

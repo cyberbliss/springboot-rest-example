@@ -1,10 +1,14 @@
 package uk.co.cyberbliss;
 
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.hateoas.ResourceSupport;
 public class Book extends ResourceSupport{
 
     private String isbn;
+
+    @NotBlank
     private String title;
+
     private String author;
 
     public Book() {

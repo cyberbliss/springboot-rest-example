@@ -1,7 +1,0 @@
-{
-  "name": "Example Spring Boot Microservice",
-  "version": "0.1.0",
-  "description": "Example of Spring Boot REST APIs",
-  "title": "Example Spring Boot Microservice",
-  "url" : "http://localhost:8095"
-}

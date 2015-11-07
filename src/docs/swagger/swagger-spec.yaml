@@ -9,10 +9,10 @@ info:
   title: Example Book REST service
 
 host: localhost:9080
-basePath: /api
+#basePath: /api
 
 paths:
-  /books:
+  /api/books:
     get:
       tags:
         - Book
@@ -59,7 +59,7 @@ paths:
         400:
           description: Invalid params supplied
           
-  /book:
+  /api/book:
     post:
       tags:
         - Book
@@ -83,7 +83,7 @@ paths:
           schema:
             $ref: "#/definitions/Book"
       
-  /book/{isbn}:
+  /api/book/{isbn}:
     get:
       tags:
         - Book
@@ -108,7 +108,7 @@ paths:
     put:
       tags:
         - Book
-      summary: Update a Book's details
+      summary: Update details for a Book
       consumes:
         - application/json
       produces:
@@ -134,6 +134,8 @@ paths:
       tags:
         - Book
       summary: Delete a Book
+      consumes:
+              - application/json
       parameters:
         - name: isbn
           in: path

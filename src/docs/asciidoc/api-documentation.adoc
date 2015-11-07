@@ -1,0 +1,10 @@
+= API Documentation for the Books Application
+Stephen Judd;
+:doctype: book
+:toc:
+:toclevels: 4
+:source-highlighter: highlightjs
+
+include::{snippets}/overview.adoc[]
+include::{snippets}/paths.adoc[]
+include::{snippets}/definitions.adoc[]

@@ -1,6 +1,6 @@
 #%RAML 0.8
 title: Books API for example Books application
-baseUri: http://localhost:9080/api
+baseUri: http://localhost:9080
 version: v0.0.1
 documentation:
   - title: Overview
@@ -30,7 +30,7 @@ schemas:
             }
           }
         }
-/books:
+/api/books:
   get:
     description: Retrieve a list of all books in the system
     responses:
@@ -61,7 +61,7 @@ schemas:
                     }
                 }
               ]
-/book:
+/api/book:
     post:
         description: Add a book
         body:
@@ -89,6 +89,11 @@ schemas:
               description:    Invalid input
 
     /{isbn}:
+        description: ISBN identifier
+        uriParameters:
+          isbn:
+            type: string
+            example: 111-3
         get:
             description: Retrieve a book via its ISBN
             responses:
@@ -98,7 +103,7 @@ schemas:
                             schema: book
                             example: |
                                 {
-                                    "isbn": "111-1",
+                                    "isbn": "111-3",
                                     "title": "Java 8 Lamdas",
                                     "author": "Richard Warburton",
                                     "_links": {
@@ -111,6 +116,15 @@ schemas:
                     description: Book not found
         put:
           description: Update an existing Book using its ISBN as the key
+          body:
+            application/json:
+              schema: book
+              example: |
+                {
+                  "isbn": "111-1",
+                  "title": "New Test",
+                  "author": "Steve"
+                }
           responses:
             200:
               body:
